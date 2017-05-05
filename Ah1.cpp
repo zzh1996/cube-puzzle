@@ -7,9 +7,11 @@
 #include <string>
 #include <climits>
 #include <stack>
+#include <ctime>
 
-#define h_func h2
+#define h_func h1
 #define algo astar
+#define filename "output_Ah1.txt"
 
 using namespace std;
 
@@ -256,7 +258,7 @@ string idastar(State &start){
         if(t==INT_MAX)
             return "No solution";
         bound=t;
-        cout<<bound<<endl;
+        //cout<<bound<<endl;
     }
 }
 
@@ -267,9 +269,17 @@ int main(){
     prepare_h2();
     fclose(fp);
     fp=fopen("input.txt","r");
-    State start(fp);
-    start.h_func();
+    State s(fp);
+    s.h_func();
     fclose(fp);
-    cout<<algo(start)<<endl;
+    clock_t start, finish;
+    double totaltime;
+    start = clock();
+    string answer=algo(s);
+    finish = clock();
+    totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
+    fp=fopen(filename,"w");
+    fprintf(fp,"%s\n%.3f\n",answer.c_str(),totaltime);
+    fclose(fp);
     return 0;
 }
