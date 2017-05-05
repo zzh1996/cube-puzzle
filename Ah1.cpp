@@ -9,7 +9,7 @@
 #include <stack>
 
 #define h_func h2
-#define algo idastar
+#define algo astar
 
 using namespace std;
 
@@ -67,9 +67,9 @@ public:
     }
 
     bool can_move(int i,int j,int k){
-        if(d[zi+i][zj+j][zk+k]==-1)
-            return false;
         if(zi+i<0||zi+i>=3||zj+j<0||zj+j>=3||zk+k<0||zk+k>=3)
+            return false;
+        if(d[zi+i][zj+j][zk+k]==-1)
             return false;
         return true;
     }
@@ -179,26 +179,21 @@ string astar(State &start){
         if(open.empty())return "No solution";
         State *s=open.top();
         open.pop();
-        //
-        //s->dump();
-        //
         if(s->f==s->g)
             return s->path();
         if(closed.find(s)==closed.end()){
             closed.insert(s);
-            for(int i=0;i<6;i++){
-                if(s->can_move(0,-1,0))open.push(s->move(0,-1,0));
-                if(s->can_move(0,1,0))open.push(s->move(0,1,0));
-                if(s->can_move(0,0,-1))open.push(s->move(0,0,-1));
-                if(s->can_move(0,0,1))open.push(s->move(0,0,1));
-                if(s->can_move(-1,0,0))open.push(s->move(-1,0,0));
-                if(s->can_move(1,0,0))open.push(s->move(1,0,0));
-            }
+            if(s->can_move(0,-1,0))open.push(s->move(0,-1,0));
+            if(s->can_move(0,1,0))open.push(s->move(0,1,0));
+            if(s->can_move(0,0,-1))open.push(s->move(0,0,-1));
+            if(s->can_move(0,0,1))open.push(s->move(0,0,1));
+            if(s->can_move(-1,0,0))open.push(s->move(-1,0,0));
+            if(s->can_move(1,0,0))open.push(s->move(1,0,0));
         }
     }
 }
 
-string idastar(State &start){
+/*string idastar(State &start){
     int d_limit=start.f;
     while(d_limit<INT_MAX){
         int next_d_limit=INT_MAX;
@@ -214,20 +209,55 @@ string idastar(State &start){
             }else{
                 if(s->f==s->g)
                     return s->path();
-                for(int i=0;i<6;i++){
-                    if(s->can_move(0,-1,0))list.push(s->move(0,-1,0));
-                    if(s->can_move(0,1,0))list.push(s->move(0,1,0));
-                    if(s->can_move(0,0,-1))list.push(s->move(0,0,-1));
-                    if(s->can_move(0,0,1))list.push(s->move(0,0,1));
-                    if(s->can_move(-1,0,0))list.push(s->move(-1,0,0));
-                    if(s->can_move(1,0,0))list.push(s->move(1,0,0));
-                }
+                if(s->can_move(0,-1,0))list.push(s->move(0,-1,0));
+                if(s->can_move(0,1,0))list.push(s->move(0,1,0));
+                if(s->can_move(0,0,-1))list.push(s->move(0,0,-1));
+                if(s->can_move(0,0,1))list.push(s->move(0,0,1));
+                if(s->can_move(-1,0,0))list.push(s->move(-1,0,0));
+                if(s->can_move(1,0,0))list.push(s->move(1,0,0));
             }
         }
         d_limit=next_d_limit;
         cout<<d_limit<<endl;
     }
     return "No solution";
+}*/
+
+State *ans;
+
+int search(State *s,int bound){
+    if(s->f>bound){
+        int r=s->f;
+        delete s;
+        return r;
+    }
+    if(s->f==s->g){
+        ans=s;
+        return -1;
+    }
+    int min=INT_MAX,t;
+    if(s->can_move(0,-1,0)){t=search(s->move(0,-1,0),bound);if(t<min)min=t;}
+    if(s->can_move(0,1,0)){t=search(s->move(0,1,0),bound);if(t<min)min=t;}
+    if(s->can_move(0,0,-1)){t=search(s->move(0,0,-1),bound);if(t<min)min=t;}
+    if(s->can_move(0,0,1)){t=search(s->move(0,0,1),bound);if(t<min)min=t;}
+    if(s->can_move(-1,0,0)){t=search(s->move(-1,0,0),bound);if(t<min)min=t;}
+    if(s->can_move(1,0,0)){t=search(s->move(1,0,0),bound);if(t<min)min=t;}
+    if(min!=-1)
+       delete s;
+    return min;
+}
+
+string idastar(State &start){
+    int bound=start.f;
+    while(1){
+        int t=search(new State(start),bound);
+        if(t==-1)
+            return ans->path();
+        if(t==INT_MAX)
+            return "No solution";
+        bound=t;
+        cout<<bound<<endl;
+    }
 }
 
 int main(){
