@@ -279,7 +279,7 @@ int main(){
     finish = clock();
     totaltime = (double)(finish-start)/CLOCKS_PER_SEC;
     fp=fopen(filename,"w");
-    fprintf(fp,"%s\n%.3f\n",answer.c_str(),totaltime);
+    fprintf(fp,"%.3f\n%s\n",totaltime,answer.c_str());
     fclose(fp);
     return 0;
 }
