@@ -5,8 +5,11 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <climits>
+#include <stack>
 
 #define h_func h2
+#define algo idastar
 
 using namespace std;
 
@@ -179,7 +182,8 @@ string astar(State &start){
         //
         //s->dump();
         //
-        if(*s==*State::target)return s->path();
+        if(s->f==s->g)
+            return s->path();
         if(closed.find(s)==closed.end()){
             closed.insert(s);
             for(int i=0;i<6;i++){
@@ -194,6 +198,38 @@ string astar(State &start){
     }
 }
 
+string idastar(State &start){
+    int d_limit=start.f;
+    while(d_limit<INT_MAX){
+        int next_d_limit=INT_MAX;
+        stack<State*> list;
+        list.push(new State(start));
+        while(!list.empty()){
+            //cout<<list.size()<<endl;
+            State *s=list.top();
+            list.pop();
+            if(s->f>d_limit){
+                if(s->f<next_d_limit)
+                    next_d_limit=s->f;
+            }else{
+                if(s->f==s->g)
+                    return s->path();
+                for(int i=0;i<6;i++){
+                    if(s->can_move(0,-1,0))list.push(s->move(0,-1,0));
+                    if(s->can_move(0,1,0))list.push(s->move(0,1,0));
+                    if(s->can_move(0,0,-1))list.push(s->move(0,0,-1));
+                    if(s->can_move(0,0,1))list.push(s->move(0,0,1));
+                    if(s->can_move(-1,0,0))list.push(s->move(-1,0,0));
+                    if(s->can_move(1,0,0))list.push(s->move(1,0,0));
+                }
+            }
+        }
+        d_limit=next_d_limit;
+        cout<<d_limit<<endl;
+    }
+    return "No solution";
+}
+
 int main(){
     FILE *fp=fopen("target.txt","r");
     State target(fp);
@@ -204,6 +240,6 @@ int main(){
     State start(fp);
     start.h_func();
     fclose(fp);
-    cout<<astar(start)<<endl;
+    cout<<algo(start)<<endl;
     return 0;
 }
