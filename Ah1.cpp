@@ -15,7 +15,8 @@ public:
     int d[3][3][3];
     int zi,zj,zk;
     State *parent;
-    int h;
+    int g;
+    int f;
     static State *target;
 
     State(FILE *fp){
@@ -32,6 +33,7 @@ public:
             }
         }
         parent=NULL;
+        g=0;
         h2();
     }
 
@@ -45,7 +47,7 @@ public:
             }
             cout<<endl;
         }
-        cout<<path()<<" "<<h<<" "<<zi<<zj<<zk<<endl;
+        cout<<path()<<" "<<f<<" "<<zi<<zj<<zk<<endl<<endl;
     }
 
     bool operator==(State &rhs){
@@ -76,6 +78,7 @@ public:
         next->d[zi][zj][zk]=d[next->zi][next->zj][next->zk];
         next->d[next->zi][next->zj][next->zk]=0;
         next->parent=this;
+        next->g=g+1;
         next->h2();
         return next;
     }
@@ -105,7 +108,7 @@ public:
                 }
             }
         }
-        h=miss;
+        f=miss+g;
     }
 
     void h2(){
@@ -119,7 +122,7 @@ public:
                 }
             }
         }
-        h=dis;
+        f=dis+g;
     }
 };
 
@@ -143,7 +146,7 @@ public:
 class less_h{
 public:
     bool operator()(State *a,State *b){
-        return a->h>b->h;
+        return a->f>b->f;
     }
 };
 
