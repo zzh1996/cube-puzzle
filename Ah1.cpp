@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 
+#define h_func h2
+
 using namespace std;
 
 int pi[27],pj[27],pk[27];
@@ -34,7 +36,6 @@ public:
         }
         parent=NULL;
         g=0;
-        h2();
     }
 
     void dump(){
@@ -79,7 +80,7 @@ public:
         next->d[next->zi][next->zj][next->zk]=0;
         next->parent=this;
         next->g=g+1;
-        next->h2();
+        next->h_func();
         return next;
     }
 
@@ -194,13 +195,14 @@ string astar(State &start){
 }
 
 int main(){
-    FILE *fp=fopen("input.txt","r");
-    State start(fp);
-    fclose(fp);
-    fp=fopen("target.txt","r");
+    FILE *fp=fopen("target.txt","r");
     State target(fp);
     State::target=&target;
     prepare_h2();
+    fclose(fp);
+    fp=fopen("input.txt","r");
+    State start(fp);
+    start.h_func();
     fclose(fp);
     cout<<astar(start)<<endl;
     return 0;
