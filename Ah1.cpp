@@ -15,6 +15,7 @@ public:
     int d[3][3][3];
     int zi,zj,zk;
     State *parent;
+    int h;
     static State *target;
 
     State(FILE *fp){
@@ -31,6 +32,7 @@ public:
             }
         }
         parent=NULL;
+        h2();
     }
 
     void dump(){
@@ -43,7 +45,7 @@ public:
             }
             cout<<endl;
         }
-        cout<<path()<<" "<<h1()<<" "<<zi<<zj<<zk<<endl;
+        cout<<path()<<" "<<h<<" "<<zi<<zj<<zk<<endl;
     }
 
     bool operator==(State &rhs){
@@ -61,7 +63,7 @@ public:
     bool can_move(int i,int j,int k){
         if(d[zi+i][zj+j][zk+k]==-1)
             return false;
-        if(zi+i<0||zi+i>=3||zj+j<0||zj+j>=3||zk+k<0||zj+j>=3)
+        if(zi+i<0||zi+i>=3||zj+j<0||zj+j>=3||zk+k<0||zk+k>=3)
             return false;
         return true;
     }
@@ -74,6 +76,7 @@ public:
         next->d[zi][zj][zk]=d[next->zi][next->zj][next->zk];
         next->d[next->zi][next->zj][next->zk]=0;
         next->parent=this;
+        next->h2();
         return next;
     }
 
@@ -92,7 +95,7 @@ public:
         }
     }
 
-    int h1(){
+    void h1(){
         int miss=0;
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
@@ -102,10 +105,10 @@ public:
                 }
             }
         }
-        return miss;
+        h=miss;
     }
 
-    int h2(){
+    void h2(){
         int dis=0;
         for(int i=0;i<3;i++){
             for(int j=0;j<3;j++){
@@ -116,7 +119,7 @@ public:
                 }
             }
         }
-        return dis;
+        h=dis;
     }
 };
 
@@ -137,17 +140,10 @@ public:
     }
 };
 
-class less_h1{
+class less_h{
 public:
     bool operator()(State *a,State *b){
-        return a->h1()>b->h1();
-    }
-};
-
-class less_h2{
-public:
-    bool operator()(State *a,State *b){
-        return a->h2()>b->h2();
+        return a->h>b->h;
     }
 };
 
@@ -170,7 +166,7 @@ void prepare_h2(){
 
 string astar(State &start){
     set<State*,less_p> closed;
-    priority_queue<State*,vector<State*>,less_h2> open;
+    priority_queue<State*,vector<State*>,less_h> open;
     open.push(&start);
     while(1){
         if(open.empty())return "No solution";
